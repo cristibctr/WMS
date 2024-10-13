@@ -17,17 +17,19 @@ public class ShamirScheme {
     }
 
     public static void main(String[] args) {
-        int n = 5, k = 3, q = 11;
-        Secret secret = new Secret(BigInteger.valueOf(Integer.parseInt(args[0])));
+        int n = 5, k = 3;
+        BigInteger Q = BigInteger.valueOf(65521);
+        Secret secret = new Secret(new BigInteger(args[0]));
         ShamirScheme shamirScheme = new ShamirScheme(new Random());
-        Polynomial f = shamirScheme.getPolynomial(secret, k, BigInteger.valueOf(q));
+        Polynomial f = shamirScheme.getPolynomial(secret, k, Q);
         List<Share> shares = shamirScheme.getShares(n, f);
         System.out.println("The shares: " + shares);
-        Secret reconstructedSecret = shamirScheme.getSecret(shamirScheme.getKRandomShares(shares, k), q);
+        Secret reconstructedSecret = shamirScheme.getSecret(shamirScheme.getKRandomShares(shares, k), Q);
         System.out.println("The reconstructed secret: " + reconstructedSecret);
     }
 
     public Polynomial getPolynomial(Secret s, int k, BigInteger q) {
+        Validate.isTrue(s.secret().compareTo(q) < 0, "the secret must be smaller than the prime");
         BigInteger[] coefficients = Stream.concat(
                 Stream.iterate(0, i -> i+1).limit(k-1).map(i -> nextRandomBigInteger(q)),
                 Stream.of(s.secret())
@@ -37,7 +39,7 @@ public class ShamirScheme {
 
     public List<Share> getShares(int n, Polynomial f) {
         Validate.isTrue(n > 0, "n must be positive");
-        Validate.isTrue(BigInteger.valueOf(n).compareTo(f.q()) < 0, "n must be smaller than q");
+        Validate.isTrue(BigInteger.valueOf(n).compareTo(f.q()) < 0, "n must be smaller than the prime");
         // random x values don't make it more secure
         // https://crypto.stackexchange.com/questions/63488/shamir-scheme-whats-the-problem-of-not-using-random-x-coordinates
         return Stream.iterate(BigInteger.ONE, i -> i.add(BigInteger.ONE)).limit(n)
@@ -45,9 +47,8 @@ public class ShamirScheme {
                 .toList();
     }
 
-    public Secret getSecret(List<Share> shares, int q) {
+    public Secret getSecret(List<Share> shares, BigInteger Q) {
         BigInteger finalSecret = BigInteger.ZERO;
-        BigInteger Q = BigInteger.valueOf(q);
         for (var share : shares) {
             BigInteger multiplications = BigInteger.ONE;
             List<Share> allButCurrent = new ArrayList<>(List.copyOf(shares));

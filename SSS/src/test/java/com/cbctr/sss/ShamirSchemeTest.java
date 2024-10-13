@@ -66,7 +66,7 @@ public class ShamirSchemeTest {
                 new Share(BigInteger.valueOf(5), PolynomialUtil.evaluate(f, BigInteger.valueOf(5)))
         );
 
-        Secret reconstructedSecret = shamirScheme.getSecret(List.of(new Share[]{shares.get(0), shares.get(1), shares.get(3)}), q);
+        Secret reconstructedSecret = shamirScheme.getSecret(List.of(new Share[]{shares.get(0), shares.get(1), shares.get(3)}), BigInteger.valueOf(q));
 
         assertThat(reconstructedSecret, is(secret));
     }
