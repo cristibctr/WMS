@@ -9,11 +9,9 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.IntStream;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
 
 @RunWith(org.mockito.junit.MockitoJUnitRunner.class)
 public class ShamirSchemeTest {
@@ -32,7 +30,6 @@ public class ShamirSchemeTest {
         Polynomial f = new Polynomial(
                 new BigInteger[]{BigInteger.valueOf(4), BigInteger.valueOf(6), BigInteger.valueOf(2)},
                 BigInteger.valueOf(q));
-        when(random.ints()).thenReturn(new Random().ints());
         List<Share> shares = shamirScheme.getShares(n, f);
         assertThat(shares.size(), is(n));
     }
@@ -43,12 +40,11 @@ public class ShamirSchemeTest {
         Polynomial f = new Polynomial(
                 new BigInteger[]{BigInteger.valueOf(-4), BigInteger.valueOf(6), BigInteger.valueOf(2), BigInteger.valueOf(0)},
                 BigInteger.valueOf(q));
-        when(random.ints()).thenReturn(IntStream.of(5, 6, 2));
         List<Share> shares = shamirScheme.getShares(n, f);
         assertThat(shares, hasItems(
-                new Share(BigInteger.valueOf(5), BigInteger.valueOf(1)),
-                new Share(BigInteger.valueOf(6), BigInteger.valueOf(2)),
-                new Share(BigInteger.valueOf(2), BigInteger.valueOf(7))));
+                new Share(BigInteger.valueOf(1), BigInteger.valueOf(4)),
+                new Share(BigInteger.valueOf(2), BigInteger.valueOf(7)),
+                new Share(BigInteger.valueOf(3), BigInteger.valueOf(7))));
     }
 
     @Test
