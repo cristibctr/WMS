@@ -1,7 +1,5 @@
 package com.cbctr.sss;
 
-import org.apache.commons.lang3.Validate;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,26 +7,23 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
-public class ShamirScheme {
-    private final Random random;
+import org.apache.commons.lang3.Validate;
 
-    public ShamirScheme(Random random) {
-        this.random = random;
-    }
+public class ShamirScheme {
 
     public static void main(String[] args) {
         int n = 5, k = 3;
         BigInteger Q = BigInteger.valueOf(65521);
         Secret secret = new Secret(new BigInteger(args[0]));
-        ShamirScheme shamirScheme = new ShamirScheme(new Random());
-        Polynomial f = shamirScheme.getPolynomial(secret, k, Q);
+        ShamirScheme shamirScheme = new ShamirScheme();
+        Polynomial f = ShamirScheme.getPolynomial(secret, k, Q);
         List<Share> shares = shamirScheme.getShares(n, f);
         System.out.println("The shares: " + shares);
         Secret reconstructedSecret = shamirScheme.getSecret(shamirScheme.getKRandomShares(shares, k), Q);
         System.out.println("The reconstructed secret: " + reconstructedSecret);
     }
 
-    public Polynomial getPolynomial(Secret s, int k, BigInteger q) {
+    public static Polynomial getPolynomial(Secret s, int k, BigInteger q) {
         Validate.isTrue(s.secret().compareTo(q) < 0, "the secret must be smaller than the prime");
         BigInteger[] coefficients = Stream.concat(
                 Stream.iterate(0, i -> i+1).limit(k-1).map(i -> nextRandomBigInteger(q)),
@@ -37,7 +32,7 @@ public class ShamirScheme {
         return new Polynomial(coefficients, q);
     }
 
-    public List<Share> getShares(int n, Polynomial f) {
+    public static List<Share> getShares(int n, Polynomial f) {
         Validate.isTrue(n > 0, "n must be positive");
         Validate.isTrue(BigInteger.valueOf(n).compareTo(f.q()) < 0, "n must be smaller than the prime");
         // random x values don't make it more secure
@@ -47,7 +42,7 @@ public class ShamirScheme {
                 .toList();
     }
 
-    public Secret getSecret(List<Share> shares, BigInteger Q) {
+    public static Secret getSecret(List<Share> shares, BigInteger Q) {
         BigInteger finalSecret = BigInteger.ZERO;
         for (var share : shares) {
             BigInteger multiplications = BigInteger.ONE;
@@ -65,14 +60,16 @@ public class ShamirScheme {
     }
 
     private List<Share> getKRandomShares(List<Share> shares, int k) {
-        Collections.shuffle(new ArrayList<>(shares), random);
+        Collections.shuffle(new ArrayList<>(shares), new Random());
         return shares.subList(0, k);
     }
 
-    private BigInteger nextRandomBigInteger(BigInteger n) {
-        BigInteger result = new BigInteger(n.bitLength(), random);
+    //TODO: revise why we give q as parameter each time
+    //Aah because our number needs not be greater than the prime of the cyclic group
+    public static BigInteger nextRandomBigInteger(BigInteger n) {
+        BigInteger result = new BigInteger(n.bitLength(), new Random());
         while( result.compareTo(n) >= 0 ) {
-            result = new BigInteger(n.bitLength(), random);
+            result = new BigInteger(n.bitLength(), new Random());
         }
         return result;
     }

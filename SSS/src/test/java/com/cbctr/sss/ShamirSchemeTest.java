@@ -1,27 +1,23 @@
 package com.cbctr.sss;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(org.mockito.junit.MockitoJUnitRunner.class)
 public class ShamirSchemeTest {
     ShamirScheme shamirScheme;
-    @Mock
-    Random random;
 
     @Before
     public void setup() {
-        shamirScheme = new ShamirScheme(random);
+        shamirScheme = new ShamirScheme();
     }
 
     @Test

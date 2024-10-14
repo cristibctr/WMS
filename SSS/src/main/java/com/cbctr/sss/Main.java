@@ -6,27 +6,24 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        BigInteger p = new BigInteger("104729"); 
-        BigInteger g = new BigInteger("2"); 
-        int n = 5; 
-        int t = 3; 
+        // N = 10, K = 6
+        // q = prim
+        // q - 160 bits
+        //TODO: change p and q
+        BigInteger p = new BigInteger("1907");
+        BigInteger q = new BigInteger("953");
+        BigInteger g = new BigInteger("2");
+        int n = 10;
+        int k = 6;
+        CryptoContext.setContext(p, q, n, k, g);
 
         List<Node> nodes = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            nodes.add(new Node(p, g));
+            nodes.add(new Node());
         }
 
-        ElGamalThreshold elGamal = new ElGamalThreshold(p, g, nodes);
-
-        BigInteger message = new BigInteger("42");
-        BigInteger[] ciphertext = elGamal.encrypt(message);
-        System.out.println("Encrypted: " + ciphertext[0] + ", " + ciphertext[1]);
-
-        List<BigInteger> partialDecryptions = new ArrayList<>();
-        for (int i = 0; i < t; i++) {
-            partialDecryptions.add(nodes.get(i).computePartialDecryption(ciphertext[0]));
-        }
-        BigInteger decryptedMessage = elGamal.decrypt(partialDecryptions, ciphertext[0], ciphertext[1]);
-        System.out.println("Decrypted message: " + decryptedMessage);
+        Group nodesGroup = new Group(nodes);
+        var encrypted = nodes.get(2).encrypt(new BigInteger("8"), nodesGroup.getPublicKey());
+        System.out.println(nodesGroup.decrypt(encrypted));
     }
 }
