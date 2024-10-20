@@ -2,6 +2,7 @@ package com.cbctr.sss;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.cbctr.sss.CryptoContext.getContext;
@@ -34,7 +35,7 @@ public class Group {
     }
 
     private void computeShares() {
-        nodes.forEach(node -> node.computeShareAndBroadCast(this));
+        nodes.forEach(node -> node.computeShareAndBroadcast(this));
     }
 
     public void broadcastShare(List<Share> share) {
@@ -43,40 +44,15 @@ public class Group {
         }
     }
 
-    public int getNodePosition(Node node) {
-        return nodes.indexOf(node);
-    }
-
     private BigInteger computeSecretKey() {
-        List<Share> allShares = new ArrayList();
+        List<Share> allShares = new ArrayList<>();
         for (int i = 0; i < nodes.size(); i++) {
-            allShares.add(new Share(BigInteger.valueOf(i), nodes.get(i).getGlobalPrivateKeyShare()));
+            allShares.add(new Share(BigInteger.valueOf(i + 1), nodes.get(i).getGlobalPrivateKeyShare()));
         }
-        return ShamirScheme.getSecret(allShares, getContext().getP()).secret();
+        // basically get some random node's share to simulate being able to decrypt using any k nodes
+        Collections.shuffle(allShares);
+        List<Share> kShares = allShares.subList(0, getContext().getK());
+        return ShamirScheme.getSecret(kShares, getContext().getQ()).secret();
     }
 
-    public int getNodeSize() {
-        return nodes.size();
-    }
-
-    // public void computeShareAndBroadCast() {
-    //     nodes.stream().forEach(node -> {
-    //         ShamirScheme.getPolynomial(new Secret(node.getPrivateKey()), kThreshold, p);
-    //     });
-    // }
-
-    // public BigInteger[] encrypt(BigInteger message) {
-    //     BigInteger k = new BigInteger(p.bitLength(), new Random()).mod(p);
-    //     BigInteger c1 = g.modPow(k, p);
-    //     BigInteger c2 = message.multiply(publicKey.modPow(k, p)).mod(p);
-    //     return new BigInteger[]{c1, c2};
-    // }
-
-    // public BigInteger decrypt(List<BigInteger> partialDecryptions, BigInteger c1, BigInteger c2) {
-    //     BigInteger combinedDecryption = BigInteger.ONE;
-    //     for (BigInteger partialDecryption : partialDecryptions) {
-    //         combinedDecryption = combinedDecryption.multiply(partialDecryption).mod(p);
-    //     }
-    //     return c2.multiply(combinedDecryption.modInverse(p)).mod(p);
-    // }
 }

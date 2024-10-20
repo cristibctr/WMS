@@ -9,14 +9,14 @@ public class CryptoContext {
     private final BigInteger q;
     private final int n;
     private final int k;
-    private final BigInteger g;
+    private final BigInteger alpha;
 
-    private CryptoContext(BigInteger p, BigInteger q, int n, int k, BigInteger g){
+    private CryptoContext(BigInteger p, BigInteger q, int n, int k, BigInteger alpha){
         this.p = p;
         this.q = q;
         this.n = n;
         this.k = k;
-        this.g = g;
+        this.alpha = alpha;
     }
 
     public static CryptoContext getContext() {
@@ -25,8 +25,8 @@ public class CryptoContext {
         return cryptoContext;
     }
 
-    public static void setContext(BigInteger p, BigInteger q, int n, int k, BigInteger g) {
-        cryptoContext = new CryptoContext(p, q, n, k, g);
+    public static void setContext(BigInteger p, BigInteger q, int n, int k, BigInteger alpha) {
+        cryptoContext = new CryptoContext(p, q, n, k, alpha);
     }
 
     public BigInteger getP() {
@@ -37,8 +37,8 @@ public class CryptoContext {
         return this.q;
     }
 
-    public BigInteger getG() {
-        return this.g;
+    public BigInteger getAlpha() {
+        return this.alpha;
     }
 
     public int getN() {
